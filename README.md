@@ -85,6 +85,18 @@ Automatically indexes the Endee_document.pdf and runs a sample query suite.
 
 ---
 
+## Visual Demo
+
+### **A. Web Interface (Streamlit)**
+The following screenshot shows the interactive dashboard where the `Endee_document.pdf` is indexed and queried.
+![Streamlit App Output](./output_images/app_output.png)
+
+### **B. CLI Engine (Terminal)**
+The logic can also be validated via the command line, showing the retrieval and generation process in real-time.
+![CLI Output](./output_images/main_output.png)
+
+---
+
 ## Project Structure
 
 - **app.py** – Streamlit frontend and interactive UI logic.  
