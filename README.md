@@ -15,6 +15,14 @@ The goal of this project is to provide a seamless interface for querying unstruc
 
 ---
 
+## Knowledge Base
+The system is specifically grounded in the **Endee Technical Specification**. 
+* **Source File**: `Endee_document.pdf`
+* **Content**: This document contains the official architecture, installation guides, API references, and contribution internal protocols for the Endee Vector Database.
+* **Grounding**: The RAG pipeline is configured to treat this document as the "Source of Truth," ensuring all AI-generated answers are technically accurate to the Endee ecosystem.
+
+---
+
 ## System Design
 
 The architecture is built on a modular RAG pipeline that bridges the gap between raw PDF text and generative AI.
@@ -74,6 +82,8 @@ Run this command to test the logic directly in your terminal:
 python main.py
 ```
 Automatically indexes the Endee_document.pdf and runs a sample query suite.
+
+---
 
 ## Project Structure
 
