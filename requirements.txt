@@ -1,0 +1,6 @@
+streamlit
+pymupdf
+requests
+msgpack
+sentence-transformers
+numpy

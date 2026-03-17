@@ -1,139 +1,84 @@
-<p align="center">
-  <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
-      <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo-light.svg">
-      <img height="100" alt="Endee" src="docs/assets/logo-dark.svg">
-  </picture>
-</p>
+# Endee.io AI Assistant: Semantic RAG System
 
-<p align="center">
-    <b>High-performance open-source vector database for AI search, RAG, semantic search, and hybrid retrieval.</b>
-</p>
+This repository is a forked version of the **Endee Vector Database**, extended with a complete **Retrieval-Augmented Generation (RAG)** pipeline. This project demonstrates how to leverage Endee's high-performance vector indexing to build an intelligent assistant that can "chat" with technical PDF documentation.
 
-<p align="center">
-    <a href="./docs/getting-started.md"><img src="https://img.shields.io/badge/Quick_Start-Local_Setup-success?style=flat-square" alt="Quick Start"></a>
-    <a href="https://docs.endee.io/quick-start"><img src="https://img.shields.io/badge/Docs-Quick_Start-success?style=flat-square" alt="Docs"></a>
-    <a href="https://github.com/endee-io/endee/blob/master/LICENSE"><img src="https://img.shields.io/github/license/endee-io/endee?style=flat-square" alt="License"></a>
-    <a href="https://discord.gg/5HFGqDZQE3"><img src="https://img.shields.io/badge/Discord-Join_Chat-5865F2?logo=discord&style=flat-square" alt="Discord"></a>
-    <a href="https://endee.io/"><img src="https://img.shields.io/badge/Website-Endee-111111?style=flat-square" alt="Website"></a>
-    <!-- <a href="https://endee.io/benchmarks"><img src="https://img.shields.io/badge/Benchmarks-Coming_Soon-1F8B4C?style=flat-square" alt="Benchmarks"></a> -->
-    <!-- <a href="https://endee.io/cloud"><img src="https://img.shields.io/badge/Cloud-Coming_Soon-2496ED?style=flat-square" alt="Cloud"></a> -->
-</p>
+---
 
-<p align="center">
-<strong><a href="./docs/getting-started.md">Quick Start</a> • <a href="#why-endee">Why Endee</a> • <a href="#use-cases">Use Cases</a> • <a href="#features">Features</a> • <a href="#api-and-clients">API and Clients</a> • <a href="#docs-and-links">Docs</a> • <a href="#community-and-contact">Contact</a></strong>
-</p>
+## Project Overview
+The goal of this project is to provide a seamless interface for querying unstructured technical data. By combining **Endee** as the high-performance storage layer with **Llama 3** as the reasoning engine, the system extracts, indexes, and retrieves precise information from the Endee documentation.
 
-# Endee: Open-Source Vector Database for AI Search
+### Key Capabilities:
+* **Interactive Web UI**: A Streamlit dashboard for PDF uploading and real-time chatting.
+* **CLI Logic Engine**: A terminal-based script for automated RAG flow validation.
+* **Smart Context Retrieval**: Uses sliding-window chunking to ensure technical details are preserved.
+* **Local-First Privacy**: Entirely local execution using WSL (Endee) and Ollama (LLM).
 
-**Endee** is a high-performance open-source vector database built for AI search and retrieval workloads. It is designed for teams building **RAG pipelines**, **semantic search**, **hybrid search**, recommendation systems, and filtered vector retrieval APIs that need production-oriented performance and control.
+---
 
-Endee combines vector search with filtering, sparse retrieval support, backup workflows, and deployment flexibility across local builds and Docker-based environments. The project is implemented in C++ and optimized for modern CPU targets, including AVX2, AVX512, NEON, and SVE2.
+## System Design
 
-If you want the fastest path to evaluate Endee locally, start with the [Getting Started guide](./docs/getting-started.md) or the hosted docs at [docs.endee.io](https://docs.endee.io/quick-start).
+The architecture is built on a modular RAG pipeline that bridges the gap between raw PDF text and generative AI.
 
-## Why Endee
+### RAG Pipeline Flow:
+`PDF Document` ➔ `PyMuPDF (Extract)` ➔ `SentenceTransformers (Embed)` ➔ **`Endee (Store/Search)`** ➔ `Llama 3 (Generate)` ➔ `User Answer`
 
-- Built as a dedicated vector database for AI applications, search systems, and retrieval-heavy workloads.
-- Supports dense vector retrieval plus sparse search capabilities for hybrid search use cases.
-- Includes payload filtering for metadata-aware retrieval and application-specific query logic.
-- Ships with operational features already documented in this repo, including backup flows and runtime observability.
-- Offers flexible deployment paths: local scripts, manual builds, Docker images, and prebuilt registry images.
+### 1. Ingestion Layer (`PyMuPDF`)
+Extracts raw text from the source PDF. The text is processed using a **sliding window chunking** strategy (500 characters per chunk with a 100-character overlap). This overlap ensures that semantic meaning and technical context aren't lost at chunk boundaries.
 
-## Getting Started
+### 2. Embedding Layer (`SentenceTransformers`)
+Converts text chunks into 384-dimensional dense vectors using the `all-MiniLM-L6-v2` model. This model is chosen for its industry-leading balance of speed and semantic accuracy.
 
-The full installation, build, Docker, runtime, and authentication instructions are in [docs/getting-started.md](./docs/getting-started.md).
+### 3. Storage & Retrieval Layer (**Endee**)
+The core of the system. Endee indexes these vectors using the `cosine` similarity metric. When a user issues a query, Endee performs a K-Nearest Neighbors ($k=4$) search to find the most relevant technical snippets.
 
-Fastest local path:
+### 4. Generation Layer (**Ollama / Llama 3**)
+The retrieved context is injected into a specialized prompt. The LLM (Llama 3) analyzes the context to generate a factual, grounded answer, specifically instructed to prioritize technical evidence found in headers and bullet points.
 
+---
+
+## 🛠️ Use of Endee
+Endee serves as the high-performance backbone for this project, proving its utility in AI workloads:
+* **Index Management**: Handles dynamic creation, indexing, and deletion of the `pdf_index`.
+* **Vector Operations**: Executes low-latency insertion and similarity searches of high-dimensional embeddings.
+* **Efficiency**: Optimized for modern CPU targets (AVX2/NEON), making it the ideal vector store for local developer environments like WSL.
+
+---
+
+## Setup & Installation
+
+### 1. Prerequisites
+* **Endee Server**: Must be running in your WSL/Linux environment on `http://localhost:8080`.
+* **Ollama**: Must be running on your host machine (Windows/Mac) on `http://localhost:11434` with the `llama3` model pulled.
+
+### 2. Installation
+Clone your personal fork and install the Python dependencies:
 ```bash
-chmod +x ./install.sh ./run.sh
-./install.sh --release --avx2
-./run.sh
+git clone <your-fork-link>
+cd endee
+pip install -r requirements.txt
 ```
 
-The server listens on port `8080`. For detailed setup paths, supported operating systems, CPU optimization flags, Docker usage, and authentication examples, use:
+### 3. Usage
+You can interact with the system via two different interfaces:
 
-- [Getting Started](./docs/getting-started.md)
-- [Hosted Quick Start Docs](https://docs.endee.io/quick-start)
+#### **A. Web Dashboard (Interactive)**
+Run this command to open the UI in your browser:
+```bash
+streamlit run app.py
+```
+Upload your PDF in the sidebar, click "Process PDF," and start chatting.
 
-## Use Cases
+#### **B. CLI Engine (Terminal Test)**
+Run this command to test the logic directly in your terminal:
+```bash
+python main.py
+```
+Automatically indexes the Endee_document.pdf and runs a sample query suite.
 
-### RAG and AI Retrieval
+## Project Structure
 
-Use Endee as the retrieval layer for question answering, chat assistants, copilots, and other RAG applications that need fast vector search with metadata-aware filtering.
-
-### Agentic AI and AI Agent Memory
-
-Use Endee as the long-term memory and context retrieval layer for AI agents built with frameworks like LangChain, CrewAI, AutoGen, and LlamaIndex. Store and retrieve past observations, tool outputs, conversation history, and domain knowledge mid-execution with low-latency filtered vector search, so your autonomous agents get the right context without stalling their reasoning loop.
-
-### Semantic Search
-
-Build semantic search experiences for documents, products, support content, and knowledge bases using vector similarity search instead of exact keyword-only matching.
-
-### Hybrid Search
-
-Combine dense retrieval, sparse vectors, and filtering to improve relevance for search workflows where both semantic understanding and term-level precision matter.
-
-### Recommendations and Matching
-
-Support recommendation, similarity matching, and nearest-neighbor retrieval workflows across text, embeddings, and other high-dimensional representations.
-
-## Features
-
-- **Vector search** for AI retrieval and semantic similarity workloads.
-- **Hybrid retrieval support** with sparse vector capabilities documented in [docs/sparse.md](./docs/sparse.md).
-- **Payload filtering** for structured retrieval logic documented in [docs/filter.md](./docs/filter.md).
-- **Backup APIs and flows** documented in [docs/backup-system.md](./docs/backup-system.md).
-- **Operational logging and instrumentation** documented in [docs/logs.md](./docs/logs.md) and [docs/mdbx-instrumentation.md](./docs/mdbx-instrumentation.md).
-- **CPU-targeted builds** for AVX2, AVX512, NEON, and SVE2 deployments.
-- **Docker deployment options** for local and server environments.
-
-## API and Clients
-
-Endee exposes an HTTP API for managing indexes and serving retrieval workloads. The current repo documentation and examples focus on running the server directly and calling its API endpoints.
-
-Current developer entry points:
-
-- [Getting Started](./docs/getting-started.md) for local build and run flows
-- [Hosted Docs](https://docs.endee.io/quick-start) for product documentation
-- [Release Notes 1.0.0](https://github.com/endee-io/endee/releases/tag/1.0.0) for recent platform changes
-
-## Docs and Links
-
-- [Getting Started](./docs/getting-started.md)
-- [Hosted Documentation](https://docs.endee.io/quick-start)
-- [Release Notes](https://github.com/endee-io/endee/releases/tag/1.0.0)
-- [Sparse Search](./docs/sparse.md)
-- [Filtering](./docs/filter.md)
-- [Backups](./docs/backup-system.md)
-
-## Community and Contact
-
-- Join the community on [Discord](https://discord.gg/5HFGqDZQE3)
-- Visit the website at [endee.io](https://endee.io/)
-- For trademark or branding permissions, contact [enterprise@endee.io](mailto:enterprise@endee.io)
-
-## Contributing
-
-We welcome contributions from the community to help make vector search faster and more accessible for everyone.
-
-- Submit pull requests for fixes, features, and improvements
-- Report bugs or performance issues through GitHub issues
-- Propose enhancements for search quality, performance, and deployment workflows
-
-## License
-
-Endee is open source software licensed under the **Apache License 2.0**. See the [LICENSE](./LICENSE) file for full terms.
-
-## Trademark and Branding
-
-“Endee” and the Endee logo are trademarks of Endee Labs.
-
-The Apache License 2.0 does not grant permission to use the Endee name, logos, or branding in a way that suggests endorsement or affiliation.
-
-If you offer a hosted or managed service based on this software, you must use your own branding and avoid implying it is an official Endee service.
-
-## Third-Party Software
-
-This project includes or depends on third-party software components licensed under their respective open-source licenses. Use of those components is governed by their own license terms.
+- **app.py** – Streamlit frontend and interactive UI logic.  
+- **main.py** – Standalone CLI engine for automated validation.  
+- **requirements.txt** – Python dependencies.  
+- **Endee_document.pdf** – Technical documentation for RAG testing.  
+- **ENDEE_ORIGINAL.md** – Original documentation for the Endee project.
