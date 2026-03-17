@@ -1,6 +1,6 @@
 # Endee.io AI Assistant: Semantic RAG System
 
-This repository is a forked version of the **Endee Vector Database**, extended with a complete **Retrieval-Augmented Generation (RAG)** pipeline. This project demonstrates how to leverage Endee's high-performance vector indexing to build an intelligent assistant that can "chat" with technical PDF documentation.
+This repository is a forked version of the **Endee Vector Database**, extended with a complete **Retrieval-Augmented Generation (RAG)** pipeline. This project demonstrates how to leverage Endee's high-performance vector indexing to build an intelligent assistant that can chat with technical PDF documentation.
 
 ---
 
@@ -36,7 +36,7 @@ The retrieved context is injected into a specialized prompt. The LLM (Llama 3) a
 
 ---
 
-## 🛠️ Use of Endee
+## Use of Endee
 Endee serves as the high-performance backbone for this project, proving its utility in AI workloads:
 * **Index Management**: Handles dynamic creation, indexing, and deletion of the `pdf_index`.
 * **Vector Operations**: Executes low-latency insertion and similarity searches of high-dimensional embeddings.
