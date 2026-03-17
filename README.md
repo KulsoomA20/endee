@@ -1,6 +1,6 @@
 # Endee.io AI Assistant: Semantic RAG System
 
-This repository is a forked version of the **Endee Vector Database**, extended with a complete **Retrieval-Augmented Generation (RAG)** pipeline. This project demonstrates how to leverage Endee's high-performance vector indexing to build an intelligent assistant that can "chat" with technical PDF documentation.
+This repository is a forked version of the **Endee Vector Database**, extended with a complete **Retrieval-Augmented Generation (RAG)** pipeline. This project demonstrates how to leverage Endee's high-performance vector indexing to build an intelligent assistant that can chat with technical PDF documentation.
 
 ---
 
@@ -12,6 +12,14 @@ The goal of this project is to provide a seamless interface for querying unstruc
 * **CLI Logic Engine**: A terminal-based script for automated RAG flow validation.
 * **Smart Context Retrieval**: Uses sliding-window chunking to ensure technical details are preserved.
 * **Local-First Privacy**: Entirely local execution using WSL (Endee) and Ollama (LLM).
+
+---
+
+## Knowledge Base
+The system is specifically grounded in the **Endee Technical Specification**. 
+* **Source File**: `Endee_document.pdf`
+* **Content**: This document contains the official architecture, installation guides, API references, and contribution internal protocols for the Endee Vector Database.
+* **Grounding**: The RAG pipeline is configured to treat this document as the "Source of Truth," ensuring all AI-generated answers are technically accurate to the Endee ecosystem.
 
 ---
 
@@ -36,7 +44,7 @@ The retrieved context is injected into a specialized prompt. The LLM (Llama 3) a
 
 ---
 
-## 🛠️ Use of Endee
+## Use of Endee
 Endee serves as the high-performance backbone for this project, proving its utility in AI workloads:
 * **Index Management**: Handles dynamic creation, indexing, and deletion of the `pdf_index`.
 * **Vector Operations**: Executes low-latency insertion and similarity searches of high-dimensional embeddings.
@@ -74,6 +82,8 @@ Run this command to test the logic directly in your terminal:
 python main.py
 ```
 Automatically indexes the Endee_document.pdf and runs a sample query suite.
+
+---
 
 ## Project Structure
 
